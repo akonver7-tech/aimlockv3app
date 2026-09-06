@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Super AimLock V3</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Orbitron:wght@700;900&family=Fira+Code:wght@400;500&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #05030a;
+            color: #ffffff;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- HẠT NỀN LƠ LỬNG --- */
+        .particles-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(105vh) scale(0.3); opacity: 0; }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.8; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
+
+        /* --- KHUNG APP BO TRÒN (GLASSMORPHISM) --- */
+        .app-card {
+            width: 92%;
+            max-width: 410px;
+            background: rgba(20, 10, 35, 0.75);
+            border: 1px solid rgba(180, 80, 255, 0.3);
+            border-radius: 32px;
+            padding: 22px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), 0 0 20px rgba(155, 81, 224, 0.2);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            position: relative;
+            z-index: 1;
+            margin: 20px 0;
+        }
+
+        /* --- BANNER ẢNH FREE FIRE --- */
+        .banner-container {
+            width: 100%;
+            height: 140px;
+            border-radius: 22px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        .banner-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 20%;
+        }
+
+        /* --- HEADER --- */
+        .header-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .title-main {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+
+        .title-main span {
+            color: #ff5eb1;
+            text-shadow: 0 0 12px rgba(255, 94, 177, 0.6);
+        }
+
+        .title-sub {
+            font-size: 11px;
+            color: #a39bb8;
+            margin-top: 2px;
+        }
+
+        .badge-vip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #e2d9f3;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .dot-online {
+            width: 7px;
+            height: 7px;
+            background-color: #00ff88;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00ff88;
+        }
+
+        /* --- FORM NHẬP KEY --- */
+        #login-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .key-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            font-size: 15px;
+            text-align: center;
+            border-radius: 30px;
+            outline: none;
+            transition: 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .key-input:focus {
+            border-color: #b844e0;
+            box-shadow: 0 0 15px rgba(184, 68, 224, 0.4);
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(90deg, #8e2de2, #4a00e0);
+            background: linear-gradient(90deg, #a832d7, #ed4264);
+            color: #ffffff;
+            border: none;
+            padding: 16px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 30px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 6px 20px rgba(237, 66, 100, 0.35);
+            transition: 0.2s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-submit:active {
+            transform: scale(0.96);
+        }
+
+        .error-msg {
+            color: #ff4757;
+            font-size: 13px;
+            text-align: center;
+            display: none;
+            font-weight: 600;
+        }
+
+        /* --- THANH TẢI (LOADING 1.5S) --- */
+        #loading-section {
+            display: none;
+            text-align: center;
+            padding: 25px 0;
+        }
+
+        .percent-text {
+            font-size: 36px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            background: linear-gradient(90deg, #b844e0, #ff5eb1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 7px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #a832d7, #ed4264);
+            border-radius: 10px;
+        }
+
+        .loading-desc {
+            margin-top: 12px;
+            font-size: 12px;
+            color: #a39bb8;
+        }
+
+        /* --- MENU TÍNH NĂNG --- */
+        #main-section {
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .feature-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 14px 20px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: 0.3s;
+        }
+
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(237, 66, 100, 0.3);
+        }
+
+        .feature-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #f1edfa;
+        }
+
+        /* Nút gạt Toggle Style iOS */
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255, 255, 255, 0.15);
+            transition: 0.3s;
+            border-radius: 30px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #8c829e;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background: linear-gradient(90deg, #a832d7, #ed4264);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+            background-color: #ffffff;
+            box-shadow: -2px 0 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- MÀN HÌNH MÃ CODE TERMINAL --- */
+        #code-terminal {
+            display: none;
+            margin-top: 18px;
+            background: #020105;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 18px;
+            padding: 14px;
+            height: 120px;
+            overflow-y: auto;
+            font-family: 'Fira Code', monospace;
+            box-shadow: inset 0 0 10px rgba(0, 255, 136, 0.1);
+        }
+
+        #code-output {
+            color: #00ff88;
+            font-size: 11px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        #code-terminal::-webkit-scrollbar { width: 4px; }
+        #code-terminal::-webkit-scrollbar-thumb { background: #00ff88; border-radius: 4px; }
+
+        /* --- FOOTER --- */
+        .footer-credit {
+            text-align: center;
+            margin-top: 22px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #e2d9f3;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 10px rgba(184, 68, 224, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="particles-bg" id="particles"></div>
+
+    <div class="app-card">
+        
+        <div class="banner-container">
+            <img src="https://play-lh.googleusercontent.com/SDYv1Th3VdjfM0MwObMIvH3L2I2owroB3leEtbMrFJZYRklHroxw_AspZZmno_8DBdiar3d03kHsyjBsnvcdlg=w240-h480-rw" alt="Free Fire Banner">
+        </div>
+
+        <div class="header-box">
+            <div>
+                <div class="title-main">Super <span>AimLock V3</span></div>
+                <div class="title-sub">Make by VayneZAimm</div>
+            </div>
+            <div class="badge-vip">
+                <div class="dot-online"></div> VIP ACCESS
+            </div>
+        </div>
+
+        <div id="login-section">
+            <input type="text" id="key-input" class="key-input" placeholder="Nhập Key kích hoạt...">
+            <div class="error-msg" id="error-msg">KEY KHÔNG CHÍNH XÁC!</div>
+            <button class="btn-submit" onclick="validateKey()">KÍCH HOẠT HỆ THỐNG</button>
+        </div>
+
+        <div id="loading-section">
+            <div class="percent-text"><span id="percent-count">0</span>%</div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="loading-desc">Đang nhúng Hook & Bypass Anti-Cheat...</div>
+        </div>
+
+        <div id="main-section">
+            <div class="feature-card">
+                <span class="feature-title">AimLock 85%</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" onchange="executeFeatureCode(this, 'AimLock 85%', '0x7FF8A12B')">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="feature-card">
+                <span class="feature-title">Nhạy Tâm</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" onchange="executeFeatureCode(this, 'Nhạy Tâm', '0x7FF8B401')">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="feature-card">
+                <span class="feature-title">Fix Giật</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" onchange="executeFeatureCode(this, 'Fix Giật', '0x7FF8C990')">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="feature-card">
+                <span class="feature-title">Xoá Cache</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" onchange="executeFeatureCode(this, 'Xoá Cache', '0x7FF8D00F')">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="feature-card">
+                <span class="feature-title">Xoá File Rác</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" onchange="executeFeatureCode(this, 'Xoá File Rác', '0x7FF8E112')">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="feature-card">
+                <span class="feature-title">Tăng Tốc CPU</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" onchange="executeFeatureCode(this, 'Tăng Tốc CPU', '0x7FF8F554')">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="feature-card">
+                <span class="feature-title">Tăng Mượt</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" onchange="executeFeatureCode(this, 'Tăng Mượt', '0x7FF9A001')">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div id="code-terminal">
+            <div id="code-output">// System console initialized...<br>// Waiting for user action...<br></div>
+        </div>
+
+        <div class="footer-credit">
+            make by VayneZAimm TikTok : @vaynezaimff
+        </div>
+
+    </div>
+
+    <script>
+        // --- XỬ LÝ CHECK KEY VÀ LOADING 1.5 SÂY ---
+        function validateKey() {
+            const inputVal = document.getElementById("key-input").value.trim();
+            const errorMsg = document.getElementById("error-msg");
+            const loginSec = document.getElementById("login-section");
+            const loadingSec = document.getElementById("loading-section");
+            const mainSec = document.getElementById("main-section");
+            const terminal = document.getElementById("code-terminal");
+
+            if (inputVal === "VAYNEZAIMM-KEYFREEFIRE") {
+                errorMsg.style.display = "none";
+                loginSec.style.display = "none";
+                loadingSec.style.display = "block";
+
+                let currentPercent = 0;
+                const interval = 1500 / 100; // Đủ 100% trong 1.5s
+
+                const timer = setInterval(() => {
+                    currentPercent++;
+                    document.getElementById("percent-count").innerText = currentPercent;
+                    document.getElementById("progress-fill").style.width = currentPercent + "%";
+
+                    if (currentPercent >= 100) {
+                        clearInterval(timer);
+                        setTimeout(() => {
+                            loadingSec.style.display = "none";
+                            mainSec.style.display = "flex";
+                            terminal.style.display = "block";
+                        }, 200);
+                    }
+                }, interval);
+
+            } else {
+                errorMsg.style.display = "block";
+            }
+        }
+
+        // --- XỬ LÝ XUẤT ĐOẠN CODE KHI KÍCH HOẠT CHỨC NĂNG ---
+        function executeFeatureCode(checkbox, name, memAddr) {
+            const output = document.getElementById("code-output");
+            const terminal = document.getElementById("code-terminal");
+            const time = new Date().toLocaleTimeString('vi-VN');
+
+            let codeLog = "";
+
+            if (checkbox.checked) {
+                codeLog = 
+`<span style="color: #00ff88;">[${time}] [ENABLE] ${name}
+> Memory::WriteMemory(${memAddr}, "NOP_HOOK");
+> DWORD_PTR libBase = GetModule("libil2cpp.so");
+> Memory::Patch(libBase + ${memAddr}, "\x00\x00\xa0\xe3\x1e\xff\x2f\xe1");
+> Status: ACTIVE & HOOKED SUCCESSFUL!</span>\n\n`;
+            } else {
+                codeLog = 
+`<span style="color: #ff4757;">[${time}] [DISABLE] ${name}
+> Memory::RestoreMemory(${memAddr});
+> Memory::UnHook(libBase + ${memAddr});
+> Status: REVERTED TO ORIGINAL STATE!</span>\n\n`;
+            }
+
+            output.innerHTML += codeLog;
+            terminal.scrollTop = terminal.scrollHeight; // Tự cuộn xuống dòng mới nhất
+        }
+
+        // --- HIỆU ỨNG HẠT TÍM/XANH BAY PHÍA NỀN ---
+        function initParticles() {
+            const container = document.getElementById("particles");
+            const colors = ['#ed4264', '#a832d7', '#00ff88', '#ffffff'];
+            
+            for (let i = 0; i < 40; i++) {
+                const p = document.createElement("div");
+                p.className = "particle";
+                
+                const size = Math.random() * 3 + 1.5;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                p.style.width = size + "px";
+                p.style.height = size + "px";
+                p.style.backgroundColor = color;
+                p.style.boxShadow = `0 0 ${size * 3}px ${color}`;
+                p.style.left = Math.random() * 100 + "vw";
+                p.style.animationDuration = (Math.random() * 6 + 5) + "s";
+                p.style.animationDelay = (Math.random() * 4) + "s";
+
+                container.appendChild(p);
+            }
+        }
+
+        window.onload = initParticles;
+    </script>
+</body>
+</html>
